@@ -47,6 +47,8 @@
 #include "utils.h"
 #include "matrices.h"
 
+#define PI 3.141592
+
 // Estrutura que representa um modelo geométrico carregado a partir de um
 // arquivo ".obj". Veja https://en.wikipedia.org/wiki/Wavefront_.obj_file .
 struct ObjModel
@@ -317,12 +319,12 @@ int main(int argc, char *argv[])
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 
-    float i;
+    float i = 0.0;
 
     // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
     {
-        i = (i > 3.141592 * 2.0f) ? 0 : i + 0.05;
+        i = (i > PI * 2.0f) ? 0 : i + 0.03;
 
         // Aqui executamos as operações de renderização
 
@@ -368,13 +370,13 @@ int main(int argc, char *argv[])
         // Note que, no sistema de coordenadas da câmera, os planos near e far
         // estão no sentido negativo! Veja slides 176-204 do documento Aula_09_Projecoes.pdf.
         float nearplane = -0.1f; // Posição do "near plane"
-        float farplane = -10.0f; // Posição do "far plane"
+        float farplane = -20.0f; // Posição do "far plane"
 
         if (g_UsePerspectiveProjection)
         {
             // Projeção Perspectiva.
             // Para definição do field of view (FOV), veja slides 205-215 do documento Aula_09_Projecoes.pdf.
-            float field_of_view = 3.141592 / 3.0f;
+            float field_of_view = PI / 3.0f;
             projection = Matrix_Perspective(field_of_view, g_ScreenRatio, nearplane, farplane);
         }
         else
@@ -403,17 +405,30 @@ int main(int argc, char *argv[])
 #define BUNNY 1
 #define PLANE 2
 
-        // Desenhamos o modelo da esfera
-        model = Matrix_Translate(-1.0f, 0.0f, 0.0f);
-        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(g_object_id_uniform, SPHERE);
-        DrawVirtualObject("the_sphere");
+        // // Desenhamos o modelo da esfera
+        // model = Matrix_Translate(-1.0f, 0.0f, 0.0f);
+        // glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+        // glUniform1i(g_object_id_uniform, SPHERE);
+        // DrawVirtualObject("the_sphere");
 
         // Desenhamos o modelo do coelho
-        model = Matrix_Translate(2 * cos(i), 0.0f, sin(i));
-        glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
-        glUniform1i(g_object_id_uniform, BUNNY);
-        DrawVirtualObject("the_bunny");
+        glm::vec4 y_axis = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+
+        int bunni_amount = 5;
+
+        for (int bunni_count = 0; bunni_count <= bunni_amount; bunni_count++)
+        {
+            float bunni_spacing_angle = ((2 * PI) / (float)bunni_amount);
+            float single_bunny_spacing_angle = bunni_spacing_angle * bunni_count;
+
+            glm::mat4 bunni_translate = Matrix_Translate(3.0f * cos(i + single_bunny_spacing_angle), 0.0f, 3.0f * sin(i + single_bunny_spacing_angle));
+
+            model = bunni_translate * Matrix_Rotate(i, y_axis);
+
+            glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
+            glUniform1i(g_object_id_uniform, BUNNY);
+            DrawVirtualObject("the_bunny");
+        }
 
         // Desenhamos o plano do chão
         model = Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(4.0f, 1.0f, 4.0f);
