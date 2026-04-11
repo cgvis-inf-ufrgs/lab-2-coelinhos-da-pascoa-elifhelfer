@@ -324,7 +324,7 @@ int main(int argc, char *argv[])
     // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
     {
-        i = (i > PI * 2.0f) ? 0 : i + 0.03;
+        i = (i > PI * 2.0f) ? 0 : i + 0.02;
 
         // Aqui executamos as operações de renderização
 
@@ -414,14 +414,14 @@ int main(int argc, char *argv[])
         // Desenhamos o modelo do coelho
         glm::vec4 y_axis = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
 
-        int bunni_amount = 5;
+        int bunni_amount = 10;
 
         for (int bunni_count = 0; bunni_count <= bunni_amount; bunni_count++)
         {
             float bunni_spacing_angle = ((2 * PI) / (float)bunni_amount);
             float single_bunny_spacing_angle = bunni_spacing_angle * bunni_count;
 
-            glm::mat4 bunni_translate = Matrix_Translate(3.0f * cos(i + single_bunny_spacing_angle), 0.0f, 3.0f * sin(i + single_bunny_spacing_angle));
+            glm::mat4 bunni_translate = Matrix_Translate(7.0f * cos(i + single_bunny_spacing_angle), 0.0f, 7.0f * sin(i + single_bunny_spacing_angle));
 
             model = bunni_translate * Matrix_Rotate(i, y_axis);
 
@@ -431,7 +431,7 @@ int main(int argc, char *argv[])
         }
 
         // Desenhamos o plano do chão
-        model = Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(4.0f, 1.0f, 4.0f);
+        model = Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(10.0f, 1.0f, 10.0f);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, PLANE);
         DrawVirtualObject("the_plane");
