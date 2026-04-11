@@ -370,7 +370,7 @@ int main(int argc, char *argv[])
         // Note que, no sistema de coordenadas da câmera, os planos near e far
         // estão no sentido negativo! Veja slides 176-204 do documento Aula_09_Projecoes.pdf.
         float nearplane = -0.1f; // Posição do "near plane"
-        float farplane = -20.0f; // Posição do "far plane"
+        float farplane = -30.0f; // Posição do "far plane"
 
         if (g_UsePerspectiveProjection)
         {
@@ -412,18 +412,28 @@ int main(int argc, char *argv[])
         // DrawVirtualObject("the_sphere");
 
         // Desenhamos o modelo do coelho
+        glm::vec4 x_axis = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
         glm::vec4 y_axis = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+        glm::vec4 z_axis = glm::vec4(0.0f, 0.0f, 1.0f, 0.0f);
 
         int bunni_amount = 10;
 
-        for (int bunni_count = 0; bunni_count <= bunni_amount; bunni_count++)
+        for (int bunni_index = 0; bunni_index <= bunni_amount; bunni_index++)
         {
             float bunni_spacing_angle = ((2 * PI) / (float)bunni_amount);
-            float single_bunny_spacing_angle = bunni_spacing_angle * bunni_count;
+            float single_bunny_spacing_angle = bunni_spacing_angle * bunni_index;
+            bool should_roll = (bunni_index + 1) % 3 == 0;
+
+            glm::mat4 bunni_roll = Matrix_Rotate(i, z_axis);
 
             glm::mat4 bunni_translate = Matrix_Translate(7.0f * cos(i + single_bunny_spacing_angle), 0.0f, 7.0f * sin(i + single_bunny_spacing_angle));
 
             model = bunni_translate * Matrix_Rotate(i, y_axis);
+
+            if (should_roll)
+            {
+                model = model * bunni_roll;
+            }
 
             glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
             glUniform1i(g_object_id_uniform, BUNNY);
