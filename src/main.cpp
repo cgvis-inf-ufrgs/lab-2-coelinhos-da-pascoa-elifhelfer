@@ -324,7 +324,7 @@ int main(int argc, char *argv[])
     // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
     {
-        i = (i > PI * 2.0f) ? 0 : i + 0.02;
+        i = (i > PI * 2.0f) ? 0 : i + 0.013;
 
         // Aqui executamos as operações de renderização
 
@@ -416,19 +416,25 @@ int main(int argc, char *argv[])
         glm::vec4 y_axis = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
         glm::vec4 z_axis = glm::vec4(0.0f, 0.0f, 1.0f, 0.0f);
 
-        int bunni_amount = 10;
+        const int bunni_amount = 15;
+        const float bunni_spacing_angle = ((2 * PI) / (float)bunni_amount);
+        const int circle_radius = 8;
 
         for (int bunni_index = 0; bunni_index <= bunni_amount; bunni_index++)
         {
-            float bunni_spacing_angle = ((2 * PI) / (float)bunni_amount);
-            float single_bunny_spacing_angle = bunni_spacing_angle * bunni_index;
-            bool should_roll = (bunni_index + 1) % 3 == 0;
+            float current_bunni_angle = i + bunni_spacing_angle * bunni_index;
 
+            bool should_roll = (bunni_index + 1) % 3 == 0;
             glm::mat4 bunni_roll = Matrix_Rotate(i, z_axis);
 
-            glm::mat4 bunni_translate = Matrix_Translate(7.0f * cos(i + single_bunny_spacing_angle), 0.0f, 7.0f * sin(i + single_bunny_spacing_angle));
+            float x = circle_radius * cos(current_bunni_angle);
+            float y = sin(current_bunni_angle * 4) + 1;
+            float z = circle_radius * sin(current_bunni_angle);
 
-            model = bunni_translate * Matrix_Rotate(i, y_axis);
+            glm::mat4 bunni_translate = Matrix_Translate(x, y, z);
+            model = bunni_translate;
+
+            // model = model * Matrix_Rotate(current_bunni_angle + (3 / 2) * PI, y_axis);
 
             if (should_roll)
             {
