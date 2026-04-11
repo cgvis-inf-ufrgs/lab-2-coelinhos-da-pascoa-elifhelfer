@@ -317,9 +317,13 @@ int main(int argc, char *argv[])
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 
+    float i;
+
     // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
     {
+        i = (i > 3.141592 * 2.0f) ? 0 : i + 0.05;
+
         // Aqui executamos as operações de renderização
 
         // Definimos a cor do "fundo" do framebuffer como branco.  Tal cor é
@@ -406,7 +410,7 @@ int main(int argc, char *argv[])
         DrawVirtualObject("the_sphere");
 
         // Desenhamos o modelo do coelho
-        model = Matrix_Translate(1.0f, 0.0f, 0.0f);
+        model = Matrix_Translate(2 * cos(i), 0.0f, sin(i));
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, BUNNY);
         DrawVirtualObject("the_bunny");
