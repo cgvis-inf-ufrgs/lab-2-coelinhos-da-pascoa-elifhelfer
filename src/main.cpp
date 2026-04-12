@@ -319,12 +319,14 @@ int main(int argc, char *argv[])
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 
-    float i = 0.0;
+    float bunny_global_angle = 0.0;
+    float egg_global_angle = 0.0;
 
     // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
     {
-        i = (i > PI * 2.0f) ? 0 : i + 0.013;
+        bunny_global_angle = (bunny_global_angle > PI * 2.0f) ? 0 : bunny_global_angle + 0.013;
+        egg_global_angle = (egg_global_angle > PI * 2.0f) ? 0 : egg_global_angle + 0.02;
 
         // Aqui executamos as operações de renderização
 
@@ -416,36 +418,33 @@ int main(int argc, char *argv[])
 
         for (int bunni_index = 0; bunni_index <= bunni_amount; bunni_index++)
         {
-            float current_bunni_angle = i + bunni_spacing_angle * bunni_index;
+            float current_bunni_angle = bunny_global_angle + bunni_spacing_angle * bunni_index;
 
             bool should_roll = (bunni_index + 1) % 3 == 0;
-            glm::mat4 bunni_roll = Matrix_Rotate(i, z_axis);
 
             float x = circle_radius * cos(current_bunni_angle);
             float y = sin(current_bunni_angle * 4) + 1;
             float z = circle_radius * sin(current_bunni_angle);
 
             glm::mat4 bunni_translate = Matrix_Translate(x, y, z);
-            model = bunni_translate;
+            glm::mat4 bunni_roll = Matrix_Rotate(bunny_global_angle, z_axis);
+            glm::mat4 bunni_rotate = Matrix_Rotate(current_bunni_angle + (3 / 2) * PI, y_axis);
 
-            // model = model * Matrix_Rotate(current_bunni_angle + (3 / 2) * PI, y_axis);
-
-            if (should_roll)
-            {
-                model = model * bunni_roll;
-            }
+            model = (should_roll) ? bunni_translate * bunni_roll : bunni_translate;
 
             glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
             glUniform1i(g_object_id_uniform, BUNNY);
             DrawVirtualObject("the_bunny");
 
-            for (int egg_index = 0; egg_index <= 2; egg_index++)
+            for (int egg_index = 0; egg_index <= 1; egg_index++)
             {
                 // Desenhamos o modelo da esfera
                 glm::mat4 egg_scale = Matrix_Scale(0.3f, 0.4f, 0.3f);
+                glm::mat4 egg_translate = egg_index == 0 ? Matrix_Translate(0.0f, 1.5f, 0.0f) : Matrix_Translate(0.0f, -1.5f, 0.0f);
+                glm::mat4 egg_translate2 = Matrix_Translate(x, y, z);
+                glm::mat4 egg_rotate = Matrix_Rotate(egg_global_angle, x_axis);
 
-                model = Matrix_Translate(x + 1.0f, y + 1.0f, z + 1.0f);
-                model = model * egg_scale;
+                model = egg_translate2 * egg_rotate * egg_translate * egg_scale;
 
                 glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
                 glUniform1i(g_object_id_uniform, SPHERE);
