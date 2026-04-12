@@ -407,11 +407,12 @@ int main(int argc, char *argv[])
 #define BUNNY 1
 #define PLANE 2
 
-        // Desenhamos o modelo do coelho
         glm::vec4 x_axis = glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);
         glm::vec4 y_axis = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
         glm::vec4 z_axis = glm::vec4(0.0f, 0.0f, 1.0f, 0.0f);
 
+        // they are called 'bunni' because i thought it was funny
+        // define amount of bunnies, size of the circle they go around in and the even spacing bewtween them
         const int bunni_amount = 18;
         const float bunni_spacing_angle = ((2 * PI) / (float)bunni_amount);
         const int circle_radius = 8;
@@ -421,16 +422,21 @@ int main(int argc, char *argv[])
             float current_bunni_angle = bunni_global_angle + bunni_spacing_angle * bunni_index;
             current_bunni_angle = -current_bunni_angle; // to go anti-clockwise
 
-            bool should_roll = (bunni_index + 1) % 3 == 0;
+            bool should_roll = (bunni_index + 1) % 3 == 0; // only a few of them roll, one every three bunnies
 
+            // x and z define the circle they go on, and y defines their bounce up and down
             float bunni_x = circle_radius * cos(current_bunni_angle);
+            // 2.3 multiplies everything to make the wave taller, the angle is multiplied by 4 to make it more frequent, and the + 1 is to keep it always above ground
             float bunni_y = 2.3f * (sin(current_bunni_angle * 4) + 1);
             float bunni_z = circle_radius * sin(current_bunni_angle);
 
             glm::mat4 bunni_translate = Matrix_Translate(bunni_x, bunni_y, bunni_z);
-            glm::mat4 bunni_roll = Matrix_Rotate(-4 * (current_bunni_angle + (PI * 0.7f)), z_axis);
+            // i added some magic numbers to taste to make the roll nicer (bunni is always upright when touching the ground)
+            glm::mat4 bunni_roll = Matrix_Rotate(-4 * (current_bunni_angle + (PI * 0.7f)), z_axis); // negative to make it roll frontwards not backwards
+            // add 90 degrees to make bunni always look inwards (value decided after experimenting with the bunni and staring at a unit circle for a good while)
             glm::mat4 bunni_rotate = Matrix_Rotate(-(PI / 2 + current_bunni_angle), y_axis);
 
+            // if you do it in another order funny things happen
             model = (should_roll)
                         ? bunni_translate * bunni_rotate * bunni_roll
                         : bunni_translate * bunni_rotate;
@@ -441,13 +447,14 @@ int main(int argc, char *argv[])
 
             for (int egg_index = 0; egg_index < 2; egg_index++)
             {
-                // Desenhamos o modelo da esfera
-                float current_egg_angle = egg_global_angle + egg_index * PI;
+                // egg has a different current angle because it goes faster
+                float current_egg_angle = egg_global_angle + egg_index * PI; // times pi to make them opposite sides
 
+                // this number that multiplies the sin and cos alter the radius of the circle they go around on
                 float egg_y = 1.2f * sin(current_egg_angle);
                 float egg_z = 1.2f * cos(current_egg_angle);
 
-                glm::mat4 egg_scale = Matrix_Scale(0.3f, 0.4f, 0.3f);
+                glm::mat4 egg_scale = Matrix_Scale(0.3f, 0.4f, 0.3f); // make egg egg shaped (stretch it a little bit in the y axis) also make it small
                 glm::mat4 egg_translate = Matrix_Translate(bunni_x, bunni_y, bunni_z);
                 glm::mat4 egg_translate_around = Matrix_Translate(0.0f, egg_y, egg_z);
 
