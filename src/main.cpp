@@ -455,10 +455,9 @@ int main(int argc, char *argv[])
                 float egg_z = 1.2f * cos(current_egg_angle);
 
                 glm::mat4 egg_scale = Matrix_Scale(0.3f, 0.4f, 0.3f); // make egg egg shaped (stretch it a little bit in the y axis) also make it small
-                glm::mat4 egg_translate = Matrix_Translate(bunni_x, bunni_y, bunni_z);
                 glm::mat4 egg_translate_around = Matrix_Translate(0.0f, egg_y, egg_z);
 
-                model = egg_translate * bunni_rotate * egg_translate_around * egg_scale;
+                model = bunni_translate * bunni_rotate * egg_translate_around * egg_scale;
 
                 glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
                 glUniform1i(g_object_id_uniform, SPHERE);
