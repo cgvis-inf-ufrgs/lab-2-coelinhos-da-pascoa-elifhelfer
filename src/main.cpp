@@ -439,20 +439,19 @@ int main(int argc, char *argv[])
             glUniform1i(g_object_id_uniform, BUNNY);
             DrawVirtualObject("the_bunny");
 
-            for (int egg_index = 0; egg_index <= 1; egg_index++)
+            for (int egg_index = 0; egg_index < 2; egg_index++)
             {
                 // Desenhamos o modelo da esfera
                 float current_egg_angle = egg_global_angle + egg_index * PI;
 
-                float egg_x = 0.0f;
                 float egg_y = 1.2f * sin(current_egg_angle);
                 float egg_z = 1.2f * cos(current_egg_angle);
 
                 glm::mat4 egg_scale = Matrix_Scale(0.3f, 0.4f, 0.3f);
                 glm::mat4 egg_translate = Matrix_Translate(bunni_x, bunni_y, bunni_z);
-                glm::mat4 egg_rotate = Matrix_Translate(egg_x, egg_y, egg_z);
+                glm::mat4 egg_translate_around = Matrix_Translate(0.0f, egg_y, egg_z);
 
-                model = egg_translate * bunni_rotate * egg_rotate * egg_scale;
+                model = egg_translate * bunni_rotate * egg_translate_around * egg_scale;
 
                 glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
                 glUniform1i(g_object_id_uniform, SPHERE);
