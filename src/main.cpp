@@ -325,7 +325,7 @@ int main(int argc, char *argv[])
     // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
     while (!glfwWindowShouldClose(window))
     {
-        bunni_global_angle = (bunni_global_angle > PI * 2.0f) ? 0 : bunni_global_angle + 0.013;
+        bunni_global_angle = (bunni_global_angle > PI * 2.0f) ? 0 : bunni_global_angle + 0.008;
         egg_global_angle = (egg_global_angle > PI * 2.0f) ? 0 : egg_global_angle + 0.02;
 
         // Aqui executamos as operações de renderização
@@ -412,25 +412,28 @@ int main(int argc, char *argv[])
         glm::vec4 y_axis = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
         glm::vec4 z_axis = glm::vec4(0.0f, 0.0f, 1.0f, 0.0f);
 
-        const int bunni_amount = 1;
+        const int bunni_amount = 18;
         const float bunni_spacing_angle = ((2 * PI) / (float)bunni_amount);
         const int circle_radius = 8;
 
-        for (int bunni_index = 0; bunni_index <= bunni_amount; bunni_index++)
+        for (int bunni_index = 0; bunni_index < bunni_amount; bunni_index++)
         {
             float current_bunni_angle = bunni_global_angle + bunni_spacing_angle * bunni_index;
+            current_bunni_angle = -current_bunni_angle; // to go anti-clockwise
 
             bool should_roll = (bunni_index + 1) % 3 == 0;
 
             float bunni_x = circle_radius * cos(current_bunni_angle);
-            float bunni_y = sin(current_bunni_angle * 4) + 1;
+            float bunni_y = 2.3f * (sin(current_bunni_angle * 4) + 1);
             float bunni_z = circle_radius * sin(current_bunni_angle);
 
             glm::mat4 bunni_translate = Matrix_Translate(bunni_x, bunni_y, bunni_z);
-            glm::mat4 bunni_roll = Matrix_Rotate(bunni_global_angle, z_axis);
-            glm::mat4 bunni_rotate = Matrix_Rotate(current_bunni_angle + (3 / 2) * PI, y_axis);
+            glm::mat4 bunni_roll = Matrix_Rotate(-4 * (current_bunni_angle + (PI * 0.7f)), z_axis);
+            glm::mat4 bunni_rotate = Matrix_Rotate(-(PI / 2 + current_bunni_angle), y_axis);
 
-            model = (should_roll) ? bunni_translate * bunni_roll : bunni_translate;
+            model = (should_roll)
+                        ? bunni_translate * bunni_rotate * bunni_roll
+                        : bunni_translate * bunni_rotate;
 
             glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
             glUniform1i(g_object_id_uniform, BUNNY);
@@ -442,14 +445,14 @@ int main(int argc, char *argv[])
                 float current_egg_angle = egg_global_angle + egg_index * PI;
 
                 float egg_x = 0.0f;
-                float egg_y = sin(current_egg_angle);
-                float egg_z = cos(current_egg_angle);
+                float egg_y = 1.2f * sin(current_egg_angle);
+                float egg_z = 1.2f * cos(current_egg_angle);
 
                 glm::mat4 egg_scale = Matrix_Scale(0.3f, 0.4f, 0.3f);
                 glm::mat4 egg_translate = Matrix_Translate(bunni_x, bunni_y, bunni_z);
                 glm::mat4 egg_rotate = Matrix_Translate(egg_x, egg_y, egg_z);
 
-                model = egg_translate * egg_rotate * egg_scale;
+                model = egg_translate * bunni_rotate * egg_rotate * egg_scale;
 
                 glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
                 glUniform1i(g_object_id_uniform, SPHERE);
@@ -458,7 +461,7 @@ int main(int argc, char *argv[])
         }
 
         // Desenhamos o plano do chão
-        model = Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(20.0f, 1.0f, 20.0f);
+        model = Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(15.0f, 1.0f, 15.0f);
         glUniformMatrix4fv(g_model_uniform, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(g_object_id_uniform, PLANE);
         DrawVirtualObject("the_plane");
